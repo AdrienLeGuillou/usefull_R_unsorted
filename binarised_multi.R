@@ -10,7 +10,7 @@
 # `col` the name of the column to be split
 #
 # # first we transform the column from pure string to vector of strings (in each cell)
-# df[[col]] <- str_split(zbis[[col]], p)
+# df[[col]] <- str_split(df[[col]], p)
 #
 # # then we binarise
 # df <- binarised_multi(df, col)
