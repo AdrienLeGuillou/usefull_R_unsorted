@@ -16,6 +16,9 @@
 # df <- binarised_multi(df, col)
 ############################################################################
 
+library(dplyr)
+library(stringr)
+
 binarised_multi <- function(df, col) {
   # to transform a categorical column with multiple values (in vectors) into
   # a set of binary ones (not dummy)
