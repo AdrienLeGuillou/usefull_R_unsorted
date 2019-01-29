@@ -1,36 +1,34 @@
-############################################################################
-# a R function that create n binary columns from a categorical one where 
-# there are multiple values separated by a character `p`
-#
-# for example from the column 'color' with modalities red, green and blue
-# a cell containing "red+blue" will be binarized in red=1, blue=1 and green=0 
-#
-# with `df` our data frame,
-# `p` the variable containing the separator (here "\+" because regex)
-# `col` the name of the column to be split
-#
-# # first we transform the column from pure string to vector of strings (in each cell)
-# df[[col]] <- str_split(df[[col]], p)
-#
-# # then we binarise
-# df <- binarised_multi(df, col)
-############################################################################
-
-library(dplyr)
-library(stringr)
-
-binarised_multi <- function(df, col) {
-  # to transform a categorical column with multiple values (in vectors) into
-  # a set of binary ones (not dummy)
+#' Binarize a character column where levels are separated by a given separator
+#' 
+#' Given a dataframe with a character column `col` containing multiple levels
+#' separated by a separator `sep` return a new dataframe where this column has
+#' been split into multiple logical ones
+#' 
+#' @param df the data frame to work on
+#' @param col the column to binarize
+#' @param sep the character sepearating the values
+#' @param drop should the original column be dropped? (default = FALSE)
+#' 
+#' @return a dataframe with n logical columns corresponding to the levels
+binarised_multi <- function(df, col, sep = ",", drop = FALSE) {
+  `!!` <- rlang::`!!`
+  `%>%` <- magrittr::`%>%`
   
-  lvls <- df[[col]] %>% 
-    unlist() %>% 
-    unique() %>% 
-    sort()
+  col <- dplyr::enquo(col)
   
-  for (l in lvls) {
-    name <- str_c(col, "_", l)
-    df[[name]] <- str_detect(df[[col]], l)
+  df <- 
+    df %>% 
+    dplyr::mutate(
+      tmp_orig_tmp := !! col,
+      !! col := stringr::str_split(!!col, sep)
+    ) %>%
+    tidyr::unnest(!!col) %>% 
+    dplyr::mutate(true_tmp_true = T) %>% 
+    tidyr::spread(!!col, true_tmp_true, fill = F, sep = "_") %>% 
+    dplyr::rename(!! col := tmp_orig_tmp)
+  
+  if (drop) {
+    df <- dplyr::select(df, - !! col)
   }
   
   df
