@@ -10,7 +10,7 @@
 #' @param drop should the original column be dropped? (default = FALSE)
 #' 
 #' @return a dataframe with n logical columns corresponding to the levels
-binarised_multi <- function(df, col, sep = ",", drop = FALSE) {
+binarize_multi <- function(df, col, sep = ",", drop = FALSE) {
   `!!` <- rlang::`!!`
   `%>%` <- magrittr::`%>%`
   
